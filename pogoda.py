@@ -1,6 +1,6 @@
 import logging
 from aiogram import Bot, Dispatcher, types
-from aiogram.filters import Command
+from aiogram.filters import Command, CommandStart
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.utils.token import TokenValidationError
 import requests
@@ -8,26 +8,20 @@ from deep_translator import GoogleTranslator
 import asyncio
 from config import OPENWEATHER_API_KEY, TOKEN_POGODA
 
-# Вставьте сюда ваш токен и ключ API
 API_TOKEN = TOKEN_POGODA
 OPENWEATHER_API_KEY = OPENWEATHER_API_KEY
 
-# Включаем логирование
 logging.basicConfig(level=logging.INFO)
 
-# Создаем объекты бота и диспетчера
 bot = Bot(token=API_TOKEN)
 storage = MemoryStorage()
 dp = Dispatcher(storage=storage)
 
-
-# Приветствие команды /start
-@dp.message(Command(commands=['start']))
+@dp.message(CommandStart())
 async def send_welcome(message: types.Message):
     await message.answer("Привет! Я бот 'Предсказатель погоды'. Выбери город, и я расскажу тебе прогноз погоды.")
 
 
-# Выбор города для прогноза
 @dp.message(Command(commands=['city']))
 async def get_city(message: types.Message):
     await message.answer("Введите город, для которого хотите узнать погоду:")
@@ -37,14 +31,13 @@ async def get_city(message: types.Message):
 async def thanks_reply(message: types.Message):
     await message.answer("Пожалуйста! Рад помочь 😊")
 
-# Основная логика получения прогноза
-@dp.message()
+@dp.message(lambda message: not message.text.startswith('/') and 'спасибо' not in message.text.lower())
 async def fetch_weather(message: types.Message):
     city = message.text
     weather_data = get_weather(city)
 
     if weather_data:
-        # Перевод описания погоды на русский
+      
         translated_weather = GoogleTranslator(source='en', target='ru').translate(weather_data['description'])
 
         response = (
@@ -59,9 +52,6 @@ async def fetch_weather(message: types.Message):
     await message.answer(response)
 
 
-
-
-# Функция для получения погоды через OpenWeatherMap API
 def get_weather(city):
     url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={OPENWEATHER_API_KEY}&units=metric"
     response = requests.get(url)
@@ -77,8 +67,6 @@ def get_weather(city):
     else:
         return None
 
-
-# Запуск бота
 async def main():
     await dp.start_polling(bot)
 
