@@ -29,34 +29,6 @@
 
 ---
 
-## Установка и запуск
-
-1. **Клонирование репозитория**:
-   ```bash
-   git clone https://github.com/<ваш-логин>/<репозиторий>.git
-   cd <репозиторий>
-   ```
-
-2. **Создание виртуального окружения и установка зависимостей**:
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # Для Windows: venv\Scripts\activate
-   pip install -r requirements.txt
-   ```
-
-3. **Настройка файла `config.py`**:
-   Убедитесь, что у вас есть API-токен Telegram-бота и добавьте его в файл `config.py`:
-   ```python
-   TOKEN = "ваш_токен"
-   ```
-
-4. **Запуск бота**:
-   ```bash
-   python main.py
-   ```
-
----
-
 ## Пример работы
 
 1. Пользователь отправляет запрос: «Пицца».
